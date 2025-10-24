@@ -21,13 +21,13 @@ from restconf_final import (
     status as rest_status
 )
 
-# from netmiko_final import (
-#     create as net_create,
-#     delete as net_delete,
-#     enable as net_enable,
-#     disable as net_disable,
-#     status as net_status
-# )
+from netconf_final import (
+    create as net_create,
+    delete as net_delete,
+    enable as net_enable,
+    disable as net_disable,
+    status as net_status
+)
 from netmiko_final import gigabit_status
 from ansible_final import showrun
 import glob
@@ -135,6 +135,17 @@ while True:
                 responseMessage = rest_disable(message_parts[1], "66070124")
             elif message_parts[2] == "status":
                 responseMessage = rest_status(message_parts[1], "66070124")
+        elif method == "netconf":
+            if message_parts[2] == "create":
+                responseMessage = net_create(message_parts[1], "66070124")
+            elif message_parts[2]== "delete":
+                responseMessage = net_delete(message_parts[1], "66070124")
+            elif message_parts[2] == "enable":
+                responseMessage = net_enable(message_parts[1], "66070124")
+            elif message_parts[2] == "disable":
+                responseMessage = net_disable(message_parts[1], "66070124")
+            elif message_parts[2] == "status":
+                responseMessage = net_status(message_parts[1], "66070124")
         else:
             responseMessage = "Error: No command found."
         print(method)
