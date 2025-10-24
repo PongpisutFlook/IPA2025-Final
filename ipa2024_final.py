@@ -28,7 +28,7 @@ from restconf_final import (
 #     disable as net_disable,
 #     status as net_status
 # )
-
+from netmiko_final import gigabit_status
 from ansible_final import showrun
 import glob
 
@@ -42,7 +42,7 @@ load_dotenv()
 ACCESS_TOKEN = os.environ["WEBX_ACCESS_TOKEN"]
 
 ip = {"10.0.15.61", "10.0.15.62", "10.0.15.63", "10.0.15.64", "10.0.15.65"}
-method = 'sdsd'
+method = ''
 
 #######################################################################################
 # 3. Prepare parameters get the latest message for messages API.
@@ -105,6 +105,7 @@ while True:
         print(command)
 
 # 5. Complete the logic for each command
+
         if message_parts[1] == "restconf":
             method = "restconf"
             responseMessage = "Ok: Restconf"
@@ -113,27 +114,29 @@ while True:
             responseMessage = "Ok: Netconf"
         elif method == '':
             responseMessage = "Error: No method specified"
-        elif message_parts[1] in ["create", "delete", "enable", "disable", "status", "gigabit_status", "showrun"]:
-            responseMessage = "Error: No IP specified"
 
+        elif message_parts[1] in ["create", "delete", "enable", "disable", "status", "gigabit_status", "showrun"]:
+            if len(message_parts) < 3:
+                responseMessage = "Error: No IP specified"
+            else:
+                pass
         elif message_parts[1] not in ip:
             responseMessage = "Error: Unknown IP"
-
-
-        # elif command == "create":
-        #     responseMessage = create()
-        # elif command == "delete":
-        #     responseMessage = delete()
-        # elif command == "enable":
-        #     responseMessage = enable()
-        # elif command == "disable":
-        #     responseMessage = disable()
-        # elif command == "status":
-        #     responseMessage = status()
-        # elif command == "gigabit_status":
-        #     responseMessage = gigabit_status()
-        # elif command == "showrun":
-        #     responseMessage = showrun()
+        elif message_parts[2] == "gigabit_status":
+            responseMessage = gigabit_status(message_parts[1])
+        elif message_parts[2] == "showrun":
+            responseMessage = showrun()
+        elif method == "restconf":
+            if message_parts[2] == "create":
+                responseMessage = rest_create(message_parts[1], "66070124")
+            elif message_parts[2]== "delete":
+                responseMessage = rest_delete(message_parts[1], "66070124")
+            elif message_parts[2] == "enable":
+                responseMessage = rest_enable(message_parts[1], "66070124")
+            elif message_parts[2] == "disable":
+                responseMessage = rest_disable(message_parts[1], "66070124")
+            elif message_parts[2] == "status":
+                responseMessage = rest_status(message_parts[1], "66070124")
         else:
             responseMessage = "Error: No command found."
         print(method)
