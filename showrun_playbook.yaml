@@ -1,0 +1,26 @@
+---
+- name: BACKUP RUNNING CONFIG
+  hosts: CSR1kv
+  gather_facts: false
+  connection: network_cli
+  collections:
+    - cisco.ios
+  vars:
+    ansible_command_timeout: 120
+    ansible_connect_timeout: 60
+
+  tasks:
+   - name: GATHER HOSTNAME FACTS
+     ios_facts:
+     register: facts
+
+   - name: DISPLAY RUNNING CONFIG
+     ios_command:
+       commands:
+         - show running-config
+     register: config
+
+   - name: SAVE OUTPUT
+     copy:
+       content: "{{ config.stdout[0] }}"
+       dest: "./show_run_66070124_{{ ansible_net_hostname }}.txt"
