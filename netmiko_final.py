@@ -59,14 +59,12 @@ def read_motd(ip):
         }
 
         with ConnectHandler(**device) as conn:
-            output = conn.send_command("show banner motd")
+            output = conn.send_command("show banner motd", use_textfsm=True)
 
-        motd_message = output.strip().replace("\\!", "!")
-
-        if not motd_message:
+        if not output:
             return f"Error: No MOTD Configured"
         
-        return motd_message
+        return output
 
     except Exception as e:
         return f"Error reading MOTD from {ip}: {e}"
