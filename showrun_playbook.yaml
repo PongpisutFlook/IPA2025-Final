@@ -1,6 +1,6 @@
 ---
 - name: BACKUP RUNNING CONFIG
-  hosts: CSR1kv
+  hosts: "{{ target_ip }}"
   gather_facts: false
   connection: network_cli
   collections:

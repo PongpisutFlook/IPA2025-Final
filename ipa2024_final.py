@@ -99,10 +99,7 @@ while True:
     # check if the text of the message starts with the magic character "/" followed by your studentID and a space and followed by a command name
     #  e.g.  "/66070123 create"
     if message_parts[0] == "/66070124":
-
-        # extract the command
-        command = message.split(" ", 1)[1]
-        print(command)
+        command = ''
 
 # 5. Complete the logic for each command
 
@@ -125,7 +122,8 @@ while True:
         elif message_parts[2] == "gigabit_status":
             responseMessage = gigabit_status(message_parts[1])
         elif message_parts[2] == "showrun":
-            responseMessage = showrun()
+            command = "showrun"
+            responseMessage = showrun(message_parts[1])
         elif method == "restconf":
             if message_parts[2] == "create":
                 responseMessage = rest_create(message_parts[1], "66070124")
@@ -153,8 +151,7 @@ while True:
         # Need to attach file if responseMessage is 'ok'; 
         # Read Send a Message with Attachments Local File Attachments
         # https://developer.webex.com/docs/basics for more detail
-
-        if command == "showrun" and responseMessage == 'ok':
+        if command == "showrun" and responseMessage.strip() == 'ok':
             filename = glob.glob("show_run_*.txt")
             filename = max(filename, key=os.path.getctime)
             fileobject = open(filename, "rb")
