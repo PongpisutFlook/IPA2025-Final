@@ -1,0 +1,16 @@
+---
+- name: Configure MOTD banner
+  hosts: all
+  gather_facts: no
+  connection: network_cli
+  vars:
+    ansible_network_os: cisco.ios.ios
+    ansible_user: admin
+    ansible_password: cisco
+
+  tasks:
+    - name: Set MOTD banner
+      ios_banner:
+        banner: motd
+        text: "{{ motd_message }}"
+        state: present

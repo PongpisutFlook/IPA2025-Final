@@ -14,3 +14,30 @@ def showrun(ip):
         return 'ok'
     else:
         return f"Error: Ansible"
+
+def motd(ip, message):
+    try:
+        # escape เครื่องหมาย ! ที่มักทำให้ shell พัง
+        message = message.replace("!", "\\!")
+        command = [
+            "ansible-playbook", 
+            "motd_playbook.yaml",
+            "-i", f"{ip},",
+            "--extra-vars", f"motd_message=\"{message}\" ansible_user=admin ansible_password=cisco"
+        ]
+        result = subprocess.run(command, capture_output=True, text=True, timeout=60)
+
+        # 🔍 แสดงผลลัพธ์ไว้ดู error
+        print("=== STDOUT ===")
+        print(result.stdout)
+        print("=== STDERR ===")
+        print(result.stderr)
+        print("================")
+
+        if result.returncode == 0:
+            return 'Ok: success'
+        else:
+            return f'Error: No success (code={result.returncode})'
+
+    except Exception as e:
+        return f"Error running Ansible: {e}"

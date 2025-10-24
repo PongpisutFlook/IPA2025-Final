@@ -1,5 +1,8 @@
 from netmiko import ConnectHandler
 from pprint import pprint
+import textfsm
+import io
+import re
 
 username = "admin"
 password = "cisco"
@@ -45,3 +48,25 @@ def gigabit_status(device_ip):
 
         pprint(ans)
         return ans
+
+def read_motd(ip):
+    try:
+        device = {
+            "device_type": "cisco_ios",
+            "host": ip,
+            "username": "admin",
+            "password": "cisco",
+        }
+
+        with ConnectHandler(**device) as conn:
+            output = conn.send_command("show banner motd")
+
+        motd_message = output.strip().replace("\\!", "!")
+
+        if not motd_message:
+            return f"Error: No MOTD Configured"
+        
+        return motd_message
+
+    except Exception as e:
+        return f"Error reading MOTD from {ip}: {e}"

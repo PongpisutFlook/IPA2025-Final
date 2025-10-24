@@ -28,8 +28,8 @@ from netconf_final import (
     disable as net_disable,
     status as net_status
 )
-from netmiko_final import gigabit_status
-from ansible_final import showrun
+from netmiko_final import gigabit_status, read_motd
+from ansible_final import showrun, motd
 import glob
 
 
@@ -124,6 +124,13 @@ while True:
         elif message_parts[2] == "showrun":
             command = "showrun"
             responseMessage = showrun(message_parts[1])
+        elif message_parts[2] == "motd":
+            if len(message_parts) == 3:
+                responseMessage = read_motd(message_parts[1])
+            else:
+                motd_text = " ".join(message_parts[3:])
+                responseMessage = motd(message_parts[1], motd_text)
+        
         elif method == "restconf":
             if message_parts[2] == "create":
                 responseMessage = rest_create(message_parts[1], "66070124")
