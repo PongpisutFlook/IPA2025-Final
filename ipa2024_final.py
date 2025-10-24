@@ -1,7 +1,7 @@
 #######################################################################################
 # Yourname: Pongpisut Tupwong
 # Your student ID: 66070124
-# Your GitHub Repo: https://github.com/PongpisutFlook/IPA2024-Final
+# Your GitHub Repo: https://github.com/PongpisutFlook/IPA2025-Final
 
 #######################################################################################
 # 1. Import libraries for API requests, JSON formatting, time, os, (restconf_final or netconf_final), netmiko_final, and ansible_final.
@@ -13,8 +13,22 @@ import requests
 from dotenv import load_dotenv
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
-from restconf_final import create, delete, enable, disable, status
-from netmiko_final import gigabit_status
+from restconf_final import (
+    create as rest_create,
+    delete as rest_delete,
+    enable as rest_enable,
+    disable as rest_disable,
+    status as rest_status
+)
+
+# from netmiko_final import (
+#     create as net_create,
+#     delete as net_delete,
+#     enable as net_enable,
+#     disable as net_disable,
+#     status as net_status
+# )
+
 from ansible_final import showrun
 import glob
 
@@ -26,6 +40,9 @@ import glob
 load_dotenv()
 
 ACCESS_TOKEN = os.environ["WEBX_ACCESS_TOKEN"]
+
+ip = {"10.0.15.61", "10.0.15.62", "10.0.15.63", "10.0.15.64", "10.0.15.65"}
+method = 'sdsd'
 
 #######################################################################################
 # 3. Prepare parameters get the latest message for messages API.
@@ -75,35 +92,51 @@ while True:
     
     # store the text of the first message in the array
     message = messages[0]["text"]
-    print("Received message: " + message)
+   
+    message_parts = message.strip().split()
+    print(message_parts)
 
     # check if the text of the message starts with the magic character "/" followed by your studentID and a space and followed by a command name
     #  e.g.  "/66070123 create"
-    if message.startswith("/66070124"):
+    if message_parts[0] == "/66070124":
 
         # extract the command
         command = message.split(" ", 1)[1]
         print(command)
 
 # 5. Complete the logic for each command
+        if message_parts[1] == "restconf":
+            method = "restconf"
+            responseMessage = "Ok: Restconf"
+        elif message_parts[1] == "netconf":
+            method = "netconf"
+            responseMessage = "Ok: Netconf"
+        elif method == '':
+            responseMessage = "Error: No method specified"
+        elif message_parts[1] in ["create", "delete", "enable", "disable", "status", "gigabit_status", "showrun"]:
+            responseMessage = "Error: No IP specified"
 
-        if command == "create":
-            responseMessage = create()
-        elif command == "delete":
-            responseMessage = delete()
-        elif command == "enable":
-            responseMessage = enable()
-        elif command == "disable":
-            responseMessage = disable()
-        elif command == "status":
-            responseMessage = status()
-        elif command == "gigabit_status":
-            responseMessage = gigabit_status()
-        elif command == "showrun":
-            responseMessage = showrun()
+        elif message_parts[1] not in ip:
+            responseMessage = "Error: Unknown IP"
+
+
+        # elif command == "create":
+        #     responseMessage = create()
+        # elif command == "delete":
+        #     responseMessage = delete()
+        # elif command == "enable":
+        #     responseMessage = enable()
+        # elif command == "disable":
+        #     responseMessage = disable()
+        # elif command == "status":
+        #     responseMessage = status()
+        # elif command == "gigabit_status":
+        #     responseMessage = gigabit_status()
+        # elif command == "showrun":
+        #     responseMessage = showrun()
         else:
-            responseMessage = "Error: No command or unknown command"
-        
+            responseMessage = "Error: No command found."
+        print(method)
 # 6. Complete the code to post the message to the Webex Teams room.
 
         # The Webex Teams POST JSON data for command showrun
